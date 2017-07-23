@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Phaser - Making your first game, part 9</title>
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css"> </head>
+
+<body>
+    <div id="gameArea"></div>
+    <div class="login-page" id="login-page">
+        <div class="form" id="form">
+            <h1>MOBAGAME</h1>
+            <form class="login-form" onsubmit="submitForm(); return false;">
+                <input type="text" placeholder="Nom" id="inputname" />
+                <input type="text" placeholder="Couleur en HEX (ex : FFFFFF)" id="inputcolor" />
+                <p class="legende">Couleur des ennemis : F8DC4E et F9535A, essayez si vous le voulez... ;) </p>
+                <input type="submit" id="button" value="Go !" disabled="disabled" /> </form>
+        </div>
+    </div>
+</body>
+<script>
+    
+    document.getElementById('inputcolor').addEventListener('keyup', function(e) {
+		var text = document.getElementById('inputcolor').value;
+        if (text.search('F8DC4E') !== -1) {
+            alert('Cette couleur n\'est pas autorisée !');
+        }
+        if (text.search('F9535A') !== -1) {
+            alert('Cette couleur n\'est pas autorisée !');
+        }
+    text = text.replace(/F8DC4E/g,'');
+    text = text.replace(/F9535A/g,'');
+    document.getElementById('inputcolor').value = text;
+},false);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    (function () {
+        $('form > input').keyup(function () {
+            var empty = false;
+           
+            
+         
+            $('form > input').each(function () {
+                if ($(this).val() == '') {
+                    empty = true;
+                }
+            });
+            if (empty) {
+                $('#button').attr('disabled', 'disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            }
+            else {
+                $('#button').removeAttr('disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            }
+        });
+    })()
+    var form = document.getElementById('form');
+    // Get the button that opens the modal
+    var btn = document.getElementById("button");
+    btn.onclick = function (evt) {
+        evt.preventDefault()
+        form.style.display = "none";
+        console.log('Form submitted');
+        var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'gameArea', {
+            preload: preload
+            , create: create
+            , update: update
+        });
+
+        function preload() {
+            game.load.image('sky', 'assets/sky.png');
+            game.load.image('background', 'assets/background.png');
+            game.load.image('star', 'assets/star.png');
+            game.load.image('mobalib', 'assets/mobalib_white.png');
+            game.load.image('badstar', 'assets/bad_star.png');
+        }
+        var text_value;
+        var player;
+        var cursors;
+        squareSize = 15;
+        var stars;
+        var badstars;
+        var score = 0;
+        var highScore = 0;
+        var highScoreText;
+        var scoreText;
+        var texthead;
+        var inputname;
+        var inputcolor;
+        var introText;
+    
+
+        function create() {
+            //  We're going to be using physics, so enable the Arcade Physics system
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+            //  A simple background for our game
+            game.add.sprite(0, 0, 'background');
+            //  The platforms group contains the ground and the 2 ledges we can jump on
+            // Here we create the ground.
+            //  Now let's create two ledges
+            // The player and its settings
+            introText = game.add.text(game.world.centerX, 400, '- Cliquez pour commencer -', {
+                font: "40px Arial"
+                , fill: "#ffffff"
+                , align: "center"
+            });
+            introText.anchor.setTo(0.5, 0.5);
+            game.input.onDown.add(startGame, this);
+            game.world.setBounds(0, 0, 800, 600);
+            inputname = document.getElementById('inputname').value;
+            inputcolor = document.getElementById('inputcolor').value;
+            console.log(inputname);
+            player = game.add.sprite(32, game.world.height - 150, 'mobalib'), player.tint = "0x" + inputcolor;
+            player.anchor.setTo(0.5, 0.5);
+            texthead = game.add.text(32, 70, inputname);
+            texthead.anchor.setTo(1);
+            player.addChild(texthead);
+            //  We need to enable physics on the player
+            game.physics.arcade.enable(player);
+            //  Player physics properties. Give the little guy a slight bounce.
+            //  Our two animations, walking left and right.
+            createStar();
+            createbadStar();
+            //  Finally some stars to collect
+            //  The score
+            scoreText = game.add.text(16, 16, 'Score: 0', {
+                font: '16pt Arial'
+                , fill: '#000'
+            });
+            highScoreText = game.add.text(16, 50, 'Highscore: 0', {
+                font: '12pt Arial'
+                , fill: '#000'
+            });
+            cursors = game.input.keyboard.createCursorKeys();
+            game.paused = true;
+            
+            
+                game.time.events.loop(Phaser.Timer.SECOND * 2 , addStar, this);
+                game.time.events.loop(Phaser.Timer.SECOND * 3, addBadStar, this);
+
+        }
+        
+        
+        
+        
+ 
+
+        
+
+        function startGame() {
+            introText.visible = false;
+            game.paused = false;
+        }
+
+        function createbadStar() {
+            badstars = game.add.group();
+            //  We will enable physics for any star that is created in this group
+            badstars.enableBody = true;
+            var randomXbad = Math.floor(Math.random() * 10) * squareSize
+                , randomYbad = Math.floor(Math.random() * 20) * squareSize;
+            // Add a new apple.
+            var badstar = badstars.create(randomXbad, randomYbad, 'badstar');
+        }
+
+        function createStar() {
+            stars = game.add.group();
+            //  We will enable physics for any star that is created in this group
+            stars.enableBody = true;
+            var randomX = Math.floor(Math.random() * 40) * squareSize
+                , randomY = Math.floor(Math.random() * 30) * squareSize;
+            // Add a new apple.
+            var star = stars.create(randomX, randomY, 'star');
+        }
+        
+        
+    
+
+
+        function update() {
+
+
+
+            //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+            player.rotation = game.physics.arcade.angleToPointer(player);
+            game.physics.arcade.overlap(player, stars, collectStar, null, this);
+            game.physics.arcade.overlap(player, badstars, collectbadStar, null, this);
+            //  Reset the players velocity (movement)
+            var force = 5;
+            upButton = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+            downButton = game.input.keyboard.addKey(Phaser.Keyboard.S);
+            leftButton = game.input.keyboard.addKey(Phaser.Keyboard.Q);
+            rightButton = game.input.keyboard.addKey(Phaser.Keyboard.D);
+            if (leftButton.isDown) {
+                //  Move to the left
+                player.body.velocity.x -= force;
+            }
+            else if (rightButton.isDown) {
+                player.body.velocity.x += force;
+            }
+            //  Allow the player to jump if they are touching the ground.
+            if (upButton.isDown) {
+                player.body.velocity.y -= force;
+            }
+            else if (downButton.isDown) {
+                player.body.velocity.y += force;
+            }
+            player.body.maxVelocity.set(200);
+            screenWrap(player);
+            if (score < 0) {
+                location.reload();
+            }
+            //Globals HERE
+            //Update Function HERE//Psuedo code / Real code    if(player got hit by something (in other terms, he lost the game)){  //We know before this point of losing the player actually got 'some' points   
+            if (score > localStorage.getItem("highScore")) {
+                localStorage.setItem("highScore", score);
+            }
+            //If the score is greater than what was stored, then I tell localStorage, "Hey set 'score' as your new stored score as the highscore now
+            //After that I display it in the update function when the player clicks "try again" or something of the sort to reset the 
+            highScoreText.text = 'Highscore: ' + localStorage.getItem("highScore");
+            
+               
+
+        }
+
+        function screenWrap(player) {
+            if (player.x < 0) {
+                player.x = game.width;
+            }
+            else if (player.x > game.width) {
+                player.x = 0;
+            }
+            if (player.y < 0) {
+                player.y = game.height;
+            }
+            else if (player.y > game.height) {
+                player.y = 0;
+            }
+        }
+
+        function collectStar(player, star) {
+            // Removes the star from the screen
+            star.kill();
+            //  Add and update the score
+            score += 10;
+            scoreText.text = 'Score: ' + score;
+        }
+        
+        
+        function addStar() {
+
+    stars.create(360 + Math.random() * 200, 120 + Math.random() * 200,'star');
+
+}
+        function addBadStar() {
+
+    badstars.create(360 + Math.random() * 200, 120 + Math.random() * 200,'badstar');
+
+}
+
+        function collectbadStar(player, badstar) {
+            // Removes the star from the screen
+            badstar.kill();
+            //  Add and update the score
+            score -= 10;
+            scoreText.text = 'Score: ' + score;
+        }
+
+        function restart() {}
+
+        function render() {}
+    }
+</script>
+<script>
+</script>
+
+</html>
