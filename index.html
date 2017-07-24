@@ -274,6 +274,10 @@
             //  Add and update the score
             score -= 10;
             scoreText.text = 'Score: ' + score;
+             if (score < 0) {
+history.go(0);
+
+            }
         }
        
         function restart() {
