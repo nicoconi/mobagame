@@ -218,6 +218,7 @@
             player.body.maxVelocity.set(200);
             screenWrap(player);
             
+            restart();
             
             //Globals HERE
             //Update Function HERE//Psuedo code / Real code    if(player got hit by something (in other terms, he lost the game)){  //We know before this point of losing the player actually got 'some' points   
@@ -228,8 +229,7 @@
             //After that I display it in the update function when the player clicks "try again" or something of the sort to reset the 
             highScoreText.text = 'Highscore: ' + localStorage.getItem("highScore");
             
-                           restart();
-
+               
 
         }
 
@@ -258,13 +258,16 @@
         
         
         function addStar() {
-
-    stars.create(360 + Math.random() * 200, 120 + Math.random() * 200,'star');
+    var randomX = Math.floor(Math.random() * 40) * squareSize
+                , randomY = Math.floor(Math.random() * 40) * squareSize;
+            var star = stars.create(randomX, randomY, 'star');
 
 }
         function addBadStar() {
+                 var randomXbad = Math.floor(Math.random() * 10) * squareSize
+                , randomYbad = Math.floor(Math.random() * 50) * squareSize;
 
-    badstars.create(360 + Math.random() * 200, 120 + Math.random() * 200,'badstar');
+            var badstar = badstars.create(randomXbad, randomYbad, 'badstar');
 
 }
 
@@ -274,12 +277,13 @@
             //  Add and update the score
             score -= 10;
             scoreText.text = 'Score: ' + score;
-
+            
         }
        
         function restart() {
          if (score < 0) {
              location.reload();
+
             }
         }
 
