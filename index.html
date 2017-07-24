@@ -70,7 +70,7 @@
     var form = document.getElementById('form');
     // Get the button that opens the modal
     var btn = document.getElementById("button");
-    btn.onclick = function (evt) {
+   var start = btn.onclick = function (evt) {
         evt.preventDefault()
         form.style.display = "none";
         console.log('Form submitted');
@@ -149,7 +149,6 @@
             
                 game.time.events.loop(Phaser.Timer.SECOND * 2 , addStar, this);
                 game.time.events.loop(Phaser.Timer.SECOND * 3, addBadStar, this);
-restart();
         }
         
         
@@ -276,9 +275,11 @@ restart();
             score -= 10;
             scoreText.text = 'Score: ' + score;
         }
+       
         function restart() {
          if (score < 0) {
-                location.reload();
+    window.location.reload(true); 
+
             }
         }
 
