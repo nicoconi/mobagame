@@ -278,8 +278,9 @@
        
         function restart() {
          if (score < 0) {
-    window.location.reload(true); 
-
+setTimeout(function(){
+    window.location.reload();
+},100);
             }
         }
 
