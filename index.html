@@ -218,9 +218,11 @@
             }
             player.body.maxVelocity.set(200);
             screenWrap(player);
+            
             if (score < 0) {
                 location.reload();
             }
+            
             //Globals HERE
             //Update Function HERE//Psuedo code / Real code    if(player got hit by something (in other terms, he lost the game)){  //We know before this point of losing the player actually got 'some' points   
             if (score > localStorage.getItem("highScore")) {
@@ -277,7 +279,7 @@
             scoreText.text = 'Score: ' + score;
         }
 
-        function restart() {}
+        
 
         function render() {}
     }
