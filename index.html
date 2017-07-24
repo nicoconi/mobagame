@@ -218,7 +218,6 @@
             player.body.maxVelocity.set(200);
             screenWrap(player);
             
-            restart();
             
             //Globals HERE
             //Update Function HERE//Psuedo code / Real code    if(player got hit by something (in other terms, he lost the game)){  //We know before this point of losing the player actually got 'some' points   
@@ -229,7 +228,8 @@
             //After that I display it in the update function when the player clicks "try again" or something of the sort to reset the 
             highScoreText.text = 'Highscore: ' + localStorage.getItem("highScore");
             
-               
+                           restart();
+
 
         }
 
@@ -274,16 +274,12 @@
             //  Add and update the score
             score -= 10;
             scoreText.text = 'Score: ' + score;
-             if (score < 0) {
-history.go(0);
 
-            }
         }
        
         function restart() {
          if (score < 0) {
-history.go(0);
-
+             location.reload();
             }
         }
 
